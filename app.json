@@ -1,0 +1,15 @@
+{
+
+    "name": "trydeploydjango",
+
+    "description": "Self-hosted app",
+
+    "repository": "C:\Users\JDaison\Desktop\SCS-FEM-API",
+
+    "scripts": {
+
+    "postdeploy": "python manage.py makemigrations && python manage.py migrate"
+
+  }
+
+}
