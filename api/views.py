@@ -5,63 +5,22 @@ from api.serializers import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+# from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render_to_response, redirect, render, get_object_or_404, redirect
 import json,requests
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+# from django.contrib.auth import logout as auth_logout
+# from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse,JsonResponse
 from django.template.context import RequestContext
 # from django_oauth2.decorators import resource
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-@login_required(login_url='/')
-def home(request):
-    # context = RequestContext(request, {
-    #     'request': request, 'user': request.user})
-    # return render_to_response('/template/login.html', context_instance=context)
-    return render(request, 'home.html')
 
-def login(request):
-    # context = RequestContext(request, {
-    #     'request': request, 'user': request.user})
-    # return render('login.html', context_instance=context)
-    return render(request, 'registration/login.html')
+# TOKEN
 
-def logout(request):
-    auth_logout(request)
-    return redirect('/')
-
-# Create your views here.
-# @login_required
-# def Home(request):
-#     return render(request, 'home.html')
-
-
-# @login_required
-# @transaction.atomic
-# def update_profile(request):
-#     if request.method == "POST":
-#         user_form = UserForm(request.POST, instance=request.user)
-#         profile_form = ProfileForm(request.POST, instance=request.user.profile)
-#         if user_form.is_valid() and profile_form.is_valid():
-#             user_form.save()
-#             profile_form.save()
-#             return HttpResponseRedirect('/')
-#         else:
-#             messages.error(request, _('Please correct the error below.'))
-#     else:
-#         user_form = UserForm(instance=request.user)
-#         profile_form = ProfileForm(instance=request.user.profile)
-#     return render(request, 'home/profile.html', {
-#         'user_form': user_form,
-#         'profile_form': profile_form
-#     })
-
-
-# def Logout(request):
-#     logout(request)
-#     return HttpResponseRedirect('/')
+class TokenList(generics.ListCreateAPIView):
+    queryset = Token.objects.all()
+    serializer_class = TokenSerializer
 
 # SUPERADMIN
 
@@ -94,31 +53,34 @@ class BorrowerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Borrower.objects.all()
     serializer_class = BorrowerSerializer
 
-# FACILITY
-
-class FacilityList(generics.ListCreateAPIView):
-    queryset = Facility.objects.all()
-    serializer_class = FacilitySerializer
-
-
-class FacilityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Facility.objects.all()
-    serializer_class = FacilitySerializer
-
 #FACILITY
+class FacilityListss(generics.ListCreateAPIView):
+    serializer_class = FacilitySerializer
 
+    def get_queryset(self):
+        queryset = Facility.objects.all()
+        status = self.request.query_params.get('status', None)
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        return queryset
+
+class FacilityDetailss(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Facility.objects.all()
+    serializer_class = FacilitySerializer
 #ADD NEW AND SHOW ALL FACILITIES
 @api_view(['GET', 'POST'])
 def FacilityList(request):
     #dumping request.data in an array
     jsonList = [] 
     jsonList.append(request.data)
+    print(jsonList)
     
     #SHOW ALL FACILITIES 1 AND 0 STATUS
     if request.method == 'GET':
         queryset = Facility.objects.all()
         serializer_class = FacilitySerializer(queryset, many=True)
-        return Response(serializer_class.data)
+        print(serializer_class.data)
+        return JsonResponse({"data":serializer_class.data})
     
     #ADD NEW FACILITIES 
     elif request.method == 'POST':
@@ -149,12 +111,12 @@ def FacilityUnavailable(request):
 
 #EDIT particular facilitiy
 @api_view(['POST'])
-def FacilityEdit(request):
+def FacilityEdit(request,pk):
     jsonlist = []
     jsonlist.append(request.data)
-    print(request.data)
+    print("dasdkashdkshkjdhaskhdjashdkjhskhdkashdkjashdk")
     print(jsonlist)
-    queryset = Facility.objects.filter(name__iexact = jsonlist[0]['name'])
+    queryset = Facility.objects.filter(id = pk)
     print(queryset)
     if queryset:
         if jsonlist[0]['name'] == '':
@@ -187,11 +149,12 @@ def FacilityEdit(request):
 
 #CHANGE STATUS OF FACILITIES TO UNVAILABLE
 @api_view(['POST'])
-def Facilitystatus0(request):
-    jsonList = []
-    jsonList.append(request.data)
-    name = jsonList[0]['name']
-    queryset = Facility.objects.filter(status = 1 ).filter(name__iexact = name)
+def Facilitystatus0(request,pk):
+    # jsonList = []
+    # jsonList.append(request.data)
+    # name = jsonList[0]['name']
+    print(pk)
+    queryset = Facility.objects.filter(status = 1 ).filter(id = pk)
     if queryset:
         queryset[0].status = 0
         queryset[0].save()
@@ -201,11 +164,11 @@ def Facilitystatus0(request):
 
 #CHANGE STATUS OF FACILITIES TO AVAILABLE
 @api_view(['POST'])
-def Facilitystatus1(request):
-    jsonList = []
-    jsonList.append(request.data)
-    name = jsonList[0]['name']
-    queryset = Facility.objects.filter(status = 0 ).filter(name__iexact = name)
+def Facilitystatus1(request,pk):
+    # jsonList = []
+    # jsonList.append(request.data)
+    # name = jsonList[0]['name']
+    queryset = Facility.objects.filter(status = 0 ).filter(id = pk)
     if queryset:
         queryset[0].status = 1
         queryset[0].save()

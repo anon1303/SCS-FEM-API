@@ -1,6 +1,11 @@
 from .models import *
 from rest_framework import serializers
 
+class TokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Token
+        fields = ('id', 'token', 'ttl')
+        
 class SuperadminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Superadmin

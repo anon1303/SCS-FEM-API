@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = 'p#a^0cxdf3qn^b3hqqtwyse_iq(db#l$id@x-ctqp#&u&eox1#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [*]
 
 
 # Application definition
@@ -39,11 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
-    # 'social_auth',
+    'oauth2_provider',
     'social_django',
-    'google_auth',
     'rest_framework_social_oauth2',
-    # 'social.apps.django_app.default',
 
 ]
 
@@ -63,7 +62,7 @@ ROOT_URLCONF = 'scsfemapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'api/template')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,76 +89,44 @@ WSGI_APPLICATION = 'scsfemapi.wsgi.application'
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'scsfem2',
+#         'USER': 'postgres',
+#         'PASSWORD': 'password',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+# SITE_ID = 1
+DATABASES = { 'default' : dj_database_url.config()}
+try:
+  from local_settings import *
+except Exception as e:
+  pass
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Django REST Framework Settings
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'scsfem2',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
     }
 }
-SITE_ID = 1
-
-# Django REST Framework Settings
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES':(
-        'rest_framework.permissions.IsAuthenticated',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ),
+    )
 }
-
 
 # Django Settings
 AUTHENTICATION_BACKENDS = (
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
-    'google_auth.authentication.GoogleAuthBackend',
-    'social_core.backends.open_id.OpenIdAuth',
-    'social_core.backends.google.GoogleOpenId',
-    'social_core.backends.google.GoogleOAuth2',
-    'social_core.backends.google.GooglePlusAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-
-
-SOCIAL_AUTH_URLN_NAMESPACE = 'social'
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile'
-]
-
-# Google+ SignIn (google-plus)
-SOCIAL_AUTH_GOOGLE_PLUS_IGNORE_DEFAULT_SCOPE = True
-SOCIAL_AUTH_GOOGLE_PLUS_SCOPE = [
-    'https://www.googleapis.com/auth/plus.login',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile'
-]
-
-SOCAIL_AUTH_GOOGLE_OAUTH2_KEY = '734815565859-2huvg7tcc3gomik14aprf3qsttc75ecd.apps.googleusercontent.com'
-SOCAIL_AUTH_GOOGLE_OAUTH2_SECRET = 'wtGhlZ_gpf7QXSWFyVSHJ-tK'
-
-SOCIAL_AUTH_GOOGLE_PLUS_AUTH_EXTRA_ARGUMENTS = {
-      'access_type': 'offline'
-}
-# Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
-SOCIAL_AUTH_GOOGLE_OAUTH2_USE_DEPRECATED_API = True
-SOCIAL_AUTH_GOOGLE_PLUS_USE_DEPRECATED_API = True
-
-GOOGLE_OAUTH2_CLIENT_ID = '734815565859-2huvg7tcc3gomik14aprf3qsttc75ecd.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET = "wtGhlZ_gpf7QXSWFyVSHJ-tK"
-GOOGLE_WHITE_LISTED_DOMAINS = "http://localhost:8000"
-SOCIAL_AUTH_USER_MODEL = 'auth.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -195,9 +162,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
-LOGIN_REDIRECT_URL = '/'
-
-STATIC_ROOT = (os.path.join(BASE_DIR, "static"))
 
 # LOGIN_REDIRECT_URL = 'home'
