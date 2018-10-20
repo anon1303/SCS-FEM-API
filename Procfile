@@ -1,1 +1,1 @@
-web: gunicorn manage:app --log-file -
+web: gunicorn scsfemapi.wsgi --log-file -
