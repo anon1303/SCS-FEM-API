@@ -29,7 +29,7 @@ psycopg2-binary==2.7.5
 public==1.0.3
 pyasn1==0.4.4
 pyasn1-modules==0.2.2
-PyJWT==1.6.4
+PyJWT==2.4.0
 pylint==2.1.1
 python-social-auth==0.3.6
 python3-openid==3.1.0
